@@ -1,0 +1,16 @@
+img {
+    height: 150px;
+    width: 150px;
+    border-radius: 100%;
+}
+
+input {
+    display: none;
+}
+
+.success {
+    color : green;
+  }
+  .erreur {
+    color: red
+  }
