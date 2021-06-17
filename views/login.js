@@ -24,11 +24,12 @@ function verif() {
 
         document.getElementById("success").innerHTML = "les mots de passe  sont  identique";
         document.getElementById("erreur").innerHTML = "";
+        document.forms['contact'].reset();
         return true;
 
     } else {
 
-        document.getElementById("erreur").innerHTML = "les mots de passe ne sont  identique";
+        document.getElementById("erreur").innerHTML = "les mots de passe ne sont pas  identique";
         document.getElementById("success").innerHTML = "";
         return false;
     }
