@@ -1,3 +1,13 @@
+<?php
+
+session_start();
+
+if (!isset($_SESSION) || empty($_SESSION) || !isset($_SESSION['userData'])) {
+    header('Location: /views/login.php?status=expired');
+    exit;
+}
+?>
+
 <!DOCTYPE html>
 <html lang="fr">
 
@@ -13,19 +23,31 @@
 
 <body>
     <?php
-     session_start();
-     include "./database.php";
-     $dbh = Database::connect();
+    //include "./database.php";
+    //$dbh = Database::connect();
 
 
-
- echo '<div class="alert alert-success">
+    echo '<div class="alert alert-success">
  <b>Félicitation!</b> Vous etes connecté !!!!
  </div> ';
- var_dump($_SESSION);
+  
+    ?>
+    <div class=" container  mx-auto mt-2 mb-2">
+        <div class="card mx-auto mt-2 mb-2" style="width: 18rem;">
+            <img class="card-img-top" src="<?= $_SESSION["userData"]["image"] ?>" alt="Card image cap">
+            <div class="card-body">
+                <h5 class="card-title"><?= $_SESSION["userData"]["pseudo"] ?></h5>
+                <p class="card-text"><?= $_SESSION["userData"]["email"] ?></p>
+                <a href="#" class="btn btn-info">Modifier</a>
+            </div>
+        </div>
+    </div>
 
-?>
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+
+
+
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
     <script type="text/javascript" src="login.js"></script>
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>

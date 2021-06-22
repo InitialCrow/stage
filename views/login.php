@@ -1,3 +1,4 @@
+<?php session_start(); ?>
 <!DOCTYPE html>
 <html lang="fr">
 
@@ -12,6 +13,15 @@
 </head>
 
 <body>
+
+
+    <?php if (isset($_GET['status']) && $_GET['status'] === "expired") : ?>
+        <div class="alert alert-warning">
+            <b>Session Expirée</b> Merci de vous reconnecter.
+        </div>
+    <?php endif; ?>
+
+
     <div class="card mx-auto  " style="width:50vw;">
         <nav class="navbar navbar-expand-lg navbar-light bg-light">
 
@@ -34,34 +44,74 @@
             </div>
         </nav>
         <?php
-        session_start();
-        include "./database.php";
+        require_once "./database.php";
         $dbh = Database::connect();
 
-        if (isset($_POST['pseudo']));
-        if (isset($_POST['password']));
+
 
         /*************************************LOGIN******************************************************** */
-        if ($_POST) { // Si le formulaire HTML a été soumis, 
+        if (isset($_POST)) { // Si le formulaire HTML a été soumis, 
 
 
-            $req = $dbh->query("SELECT * FROM `user` WHERE pseudo='{$_POST['pseudo']}'");
-            $user = $req->fetch();
-            $req1 = $dbh->query("SELECT * FROM `password` ");
-            $password = $req1->fetch();
-            $pass = password_verify($_POST["password"], $password["password"]);
 
-            // Si l'utilisateur existe et que son mot de passe correspond à celui enregistré en BDD,
-            if ($user && $pass) {
-                $_SESSION["pseudo"] = $_POST["pseudo"];; // On connecte l'utilisateur en passant son username dans la session
-                header("Location: home.php"); // Redirection vers 'index.php'
-            } else { // Affichage des messages d'erreurs associées aux validations 
-                echo '<div class="alert alert-danger">
-                <b>Attention!</b> votre identifiant ou votre mot de passe sont incorect !!!
-                </div> ';
+            if (!empty($_POST["pseudo"]) && !empty($_POST["password"])) {
+
+
+                $req = $dbh->prepare("
+                    SELECT U.email, U.pseudo, U.id as user_id, U.image , PS.pass_prefix
+                    FROM user U
+                    INNER JOIN pass_sal PS ON PS.user_id = U.id 
+                    WHERE U.pseudo= ?
+                    LIMIT 1
+                ");
+                $req->execute([
+                    $_POST["pseudo"]
+                ]);
+
+
+                $salt = $req->fetch();
+
+                if (empty($salt)) {
+                    echo "Erreur d'identifiant";
+                    return false;
+                }
+                $password = hash("sha256", $_POST["password"]);
+
+                $password = hash("sha256", $salt['pass_prefix'] . $password);
+
+
+                $req = $dbh->prepare("
+                    SELECT P.user_id 
+                    FROM password P
+                    WHERE P.password = ? AND P.user_id = ?
+                    LIMIT 1
+                ");
+                $req->execute([
+                    $password,
+                    $salt['user_id']
+                ]);
+
+                $user = $req->fetch();
+
+                if (empty($user)) {
+                    echo "Erreur d'identifiant";
+                    return false;
+                } else {
+                    $userData = [
+                        "user_id" => $salt['user_id'],
+                        "pseudo" => $salt['pseudo'],
+                        "email" => $salt['email'],
+                        "image" => $salt['image'],
+                    ];
+                    Database::disconnect();
+                    $_SESSION['userData'] = $userData;
+                    header('Location: /views/home.php');
+                    return false;
+                    exit;
+                }
             }
         }
-        Database::disconnect();
+
 
         ?>
 
@@ -91,55 +141,7 @@
                 </form>
             </div>
 
-            <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
-                <form id="inscription" method="post">
-                    <div class="box box-primary">
-                        <div class="box-body box-profile">
 
-
-                            <div class="row d-flex">
-                                <div class="form-group col ">
-                                    <label for="pseudo">Pseudo</label>
-                                    <input type="text" class="form-control " name="pseudo" id="pseudo" aria-describedby="pseudoHelp" placeholder="Votre pseudo..." required minlength="8" maxlength="20" pattern="^\W*(?=\S{8,20})(?=\S*[a-z])(?=\S*[\d])\S*$">
-                                    <small id="pseudoLog" class="form-text text-muted">Votre pseudo doit comporter entre 8 et 20 caractères, contenir des lettres et des chiffres, et ne doit pas contenir d'espaces, de caractères spéciaux ou d'emoji.
-                                    </small>
-                                </div>
-
-                                <div class=" d-flex justify-content-center col   " id="profile-container ">
-                                    <img class="mx-auto" id="profileImage" src="https://www.icone-png.com/png/48/48154.png" />
-                                </div>
-                                <input id="imageUpload" name="picture" type="file" placeholder="Photo" required="" capture>
-
-                            </div>
-
-                        </div>
-
-                        <div class="form-group">
-                            <label for="email">Email</label>
-                            <input type="email" class="form-control " name="email" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Votre email..." required minlength="5" maxlength="40" pattern="[A-Za-z0-9](([_\.\-]?[a-zA-Z0-9]+)*)@([A-Za-z0-9]+)(([_\.\-]?[a-zA-Z0-9]+)*)\.([A-Za-z]{2,})">
-                            <small class="form-text text-muted"></small>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="Password">Password</label>
-                            <input type="password" class="form-control" id="Password" name="password" placeholder="confirmer votre mot de passe ..." required minlength="8" maxlength="20" pattern="^\W*(?=\S{8,20})(?=\S*[a-z])(?=\S*[\d])\S*$">
-                            <small class="form-text text-muted">Votre mot de passe doit comporter entre 8 et 20 caractères, contenir des lettres et des chiffres, et ne doit pas contenir d'espaces, de caractères spéciaux ou d'emoji.</small>
-                        </div>
-                        <div class="form-group">
-                            <label for="Password2">Confirmation Password</label>
-                            <input type="password" class="form-control" id="Password2" name="password2" placeholder="Reconfirmer votre mot de passe ..." required minlength="8" maxlength="20" pattern="^\W*(?=\S{8,20})(?=\S*[a-z])(?=\S*[\d])\S*$">
-
-                            <p id="success"></p>
-                            <p id="erreur"></p>
-
-                        </div>
-
-                        <button type="submit" class="btn btn-primary" onclick="verif()">Submit</button>
-                    </div>
-
-                </form>
-
-            </div>
 
 
 
@@ -158,37 +160,6 @@
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
-</body>
-
-</html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-?>
-
-
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-<script type="text/javascript" src="login.js"></script>
-<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 </body>
 
 </html>

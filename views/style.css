@@ -1,4 +1,4 @@
-img {
+#profileImage{
     height: 150px;
     width: 150px;
     border-radius: 100%;
@@ -11,6 +11,10 @@ input {
 .success {
     color : green;
   }
-  .erreur {
-    color: red
+.erreur {
+    color: red;
   }
+
+
+  
+  

@@ -34,50 +34,54 @@
             </div>
         </nav>
         <?php
-        session_start();
+
         include "./database.php";
         $dbh = Database::connect();
 
         if (isset($_POST['email']));
-        if (isset($_POST['picture']));
+        if (isset($_POST['image']));
         if (isset($_POST['pseudo']));
         if (isset($_POST['password']));
+        if (isset($_FILES['name']));
+
+
+
+
 
 
         if (!empty($_POST)) {
-            $hash = password_hash($_POST["password"], PASSWORD_DEFAULT);
-            $randomCharacter = '';
 
-            function generateSalt($randomCharacter = '', $length = 20)
-            {
-                $character = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-                $lengthMax = strlen($character);
 
-                for ($i = 0; $i < $length; $i++) {
-                    $randomCharacter .= $character[rand(0, $lengthMax - 1)];
-                }
-                return $randomCharacter;
-            }
+            $fileName = $_FILES['image']['name'];
+            $targetFile = "./upload/$fileName";
 
-            $stmt = $dbh->prepare("INSERT INTO `user` (email, picture, pseudo) VALUES (?,?,?)");
+            move_uploaded_file($_FILES['image']['tmp_name'], $targetFile);
+
+
+            $password = hash("sha256", $_POST["password"]);
+            $salt = hash("sha256", random_bytes(15));
+            $password = hash("sha256", $salt . $password);
+
+            $stmt = $dbh->prepare("INSERT INTO `user` (email, image, pseudo) VALUES (?,?,?)");
             $stmt->execute([
                 $_POST["email"],
-                $_POST["picture"],
+                $targetFile,
                 $_POST["pseudo"]
             ]);
 
             $user_id = $dbh->lastInsertId();
-            $sal = generateSalt($randomCharacter);
+
+
 
             $stmt = $dbh->prepare("INSERT INTO `password` (user_id,password) VALUES (?,?)");
             $stmt->execute([
                 $user_id,
-                $hash,
+                $password,
 
             ]);
             $stmt = $dbh->prepare("INSERT INTO `pass_sal` (pass_prefix,user_id) VALUES (?,?)");
             $stmt->execute([
-                $sal,
+                $salt,
                 $user_id,
 
             ]);
@@ -92,7 +96,7 @@
         ?>
 
         <div class="tab-content mx-5 mt-2 mb-2" id="myTabContent">
-            <form id="inscription" method="post">
+            <form id="inscription" method="post" enctype="multipart/form-data">
                 <div class="box box-primary">
                     <div class="box-body box-profile">
 
@@ -108,14 +112,12 @@
                             <div class=" d-flex justify-content-center col   " id="profile-container ">
                                 <img class="mx-auto" id="profileImage" src="https://www.icone-png.com/png/48/48154.png" />
                             </div>
-                            <input id="imageUpload" name="picture" type="file" placeholder="Photo" required="" capture>
+                            <label for="image"></label>
+                            <input id="imageUpload" for="image" name="image" type="file" placeholder="Photo" required="" capture>
 
                         </div>
 
-
-
                     </div>
-
 
                     <div class="form-group">
                         <label for="email">Email</label>
@@ -144,11 +146,7 @@
 
         </div>
 
-
-
     </div>
-
-
 
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
