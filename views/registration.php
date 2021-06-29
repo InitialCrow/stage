@@ -27,15 +27,13 @@
                     <li class="nav-item active">
                         <a class="nav-link text-primary" href="http://app.fr/views/registration.php">Registration</a>
                     </li>
-
-
                 </ul>
 
             </div>
         </nav>
         <?php
 
-        include "./database.php";
+        require_once "./database.php";
         $dbh = Database::connect();
 
         if (isset($_POST['email']));
@@ -50,8 +48,6 @@
 
 
         if (!empty($_POST)) {
-
-
             $fileName = $_FILES['image']['name'];
             $targetFile = "./upload/$fileName";
 
@@ -59,7 +55,7 @@
 
 
             $password = hash("sha256", $_POST["password"]);
-            $salt = hash("sha256", random_bytes(15));
+            $salt = hash("sha256", bin2hex(random_bytes(15)));
             $password = hash("sha256", $salt . $password);
 
             $stmt = $dbh->prepare("INSERT INTO `user` (email, image, pseudo) VALUES (?,?,?)");

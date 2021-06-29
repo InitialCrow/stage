@@ -50,7 +50,7 @@ function deploy (){
                 FOREIGN KEY (user_id)
                 REFERENCES User(id));
 
-                CREATE TABLE Reset_assword(
+                CREATE TABLE Reset_password(
                 id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
                 url_token VARCHAR(80) NOT NULL,
                 user_id  BIGINT NOT NULL,

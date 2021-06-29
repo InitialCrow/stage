@@ -49,14 +49,13 @@
 
 
 
+
         /*************************************LOGIN******************************************************** */
         if (isset($_POST)) { // Si le formulaire HTML a été soumis, 
 
 
 
             if (!empty($_POST["pseudo"]) && !empty($_POST["password"])) {
-
-
                 $req = $dbh->prepare("
                     SELECT U.email, U.pseudo, U.id as user_id, U.image , PS.pass_prefix
                     FROM user U
@@ -64,10 +63,10 @@
                     WHERE U.pseudo= ?
                     LIMIT 1
                 ");
+
                 $req->execute([
                     $_POST["pseudo"]
-                ]);
-
+                    ]);
 
                 $salt = $req->fetch();
 
@@ -79,22 +78,24 @@
 
                 $password = hash("sha256", $salt['pass_prefix'] . $password);
 
-
                 $req = $dbh->prepare("
                     SELECT P.user_id 
                     FROM password P
                     WHERE P.password = ? AND P.user_id = ?
                     LIMIT 1
-                ");
+                    ");
+
                 $req->execute([
                     $password,
                     $salt['user_id']
-                ]);
+                    ]);
 
                 $user = $req->fetch();
 
                 if (empty($user)) {
-                    echo "Erreur d'identifiant";
+                    echo '<div class="alert alert-danger">
+                    <b>Attention ! </b> Pseudo ou Password incorrect !!!
+                    </div> ';
                     return false;
                 } else {
                     $userData = [
@@ -112,13 +113,11 @@
             }
         }
 
-
         ?>
 
         <div class="tab-content mx-5 mt-2 mb-2" id="myTabContent">
             <div class="tab-pane fade show active " id="home" role="tabpanel" aria-labelledby="home-tab">
                 <form method="post" name="contact">
-
                     <div class="form-group ">
                         <label for="pseudo">Pseudo</label>
                         <input type="text" class="form-control " name="pseudo" id="pseudo" aria-describedby="pseudoHelp" placeholder="Votre pseudo..." required minlength="5" maxlength="20" pattern="^\W*(?=\S{8,20})(?=\S*[a-z])(?=\S*[\d])\S*$">
@@ -134,26 +133,14 @@
                         </small>
                     </div>
                     <div class="etc-login-form">
-                        <p>mot de passe oublie ? <a href="#"><i class="fas fa-lock fa-lg"></i></a></p>
+                        <p>mot de passe oublie ? <a href="http://app.fr/views/reset.php"><i class="fas fa-lock fa-lg"></i></a></p>
 
                     </div>
                     <button type="submit" class="btn btn-primary">Submit</button>
                 </form>
             </div>
-
-
-
-
-
-
-
-
-
         </div>
-
-
-
-    </div>
+  </div>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
     <script type="text/javascript" src="login.js"></script>
