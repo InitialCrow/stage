@@ -41,18 +41,11 @@
         if (isset($_POST['pseudo']));
         if (isset($_POST['password']));
         if (isset($_FILES['name']));
-
-
-
-
-
-
         if (!empty($_POST)) {
             $fileName = $_FILES['image']['name'];
             $targetFile = "./upload/$fileName";
 
             move_uploaded_file($_FILES['image']['tmp_name'], $targetFile);
-
 
             $password = hash("sha256", $_POST["password"]);
             $salt = hash("sha256", bin2hex(random_bytes(15)));
@@ -66,8 +59,6 @@
             ]);
 
             $user_id = $dbh->lastInsertId();
-
-
 
             $stmt = $dbh->prepare("INSERT INTO `password` (user_id,password) VALUES (?,?)");
             $stmt->execute([
@@ -86,8 +77,7 @@
                 <b>Félicitation!</b> Votre compte a bien été enregistré, vous pouvez des maintenant vous connectez !!!!
                 </div> ';
             Database::disconnect();
-        } else {
-        }
+        } 
 
         ?>
 
@@ -132,7 +122,6 @@
 
                         <p id="success"></p>
                         <p id="erreur"></p>
-
                     </div>
 
                     <button type="submit" class="btn btn-primary" onclick="verif()">Submit</button>

@@ -1,7 +1,5 @@
 <?php
-
 session_start();
-
 if (!isset($_SESSION) || empty($_SESSION) || !isset($_SESSION['userData'])) {
     header('Location: /views/login.php?status=expired');
     exit;
@@ -23,56 +21,133 @@ if (!isset($_SESSION) || empty($_SESSION) || !isset($_SESSION['userData'])) {
 
 <body>
     <?php
-    //include "./database.php";
-    //$dbh = Database::connect();
+    include "./database.php";
+    $dbh = Database::connect();
 
 
-   
-  
+    $user_id = $_SESSION["userData"]["user_id"];
+
+    if (isset($_POST['image']));
+    if (isset($_POST['email']));
+
+
+    /******************************REQUETE POUR RECUPERER  LES INFOS ***************************************/
+
+    $req = $dbh->prepare("
+                    SELECT U.email, U.pseudo, U.id as user_id, U.image , PS.pass_prefix
+                    FROM user U
+                    INNER JOIN pass_sal PS ON PS.user_id = U.id 
+                    WHERE U.pseudo= ?
+                    LIMIT 1
+                ");
+
+    $req->execute([
+        $_SESSION["userData"]["pseudo"]
+    ]);
+
+    $profil = $req->fetch();
+
+    /**************************REQUETE MISE A JOUR DES INFORMATIONS ********************************/
+    if (!empty($_POST)) {
+        $fileName = $_FILES['image']['name'];
+        $targetFile = "./upload/$fileName";
+        move_uploaded_file($_FILES['image']['tmp_name'], $targetFile);
+        $req = $dbh->prepare("UPDATE `user`  
+        set  email= ? ,image = ? ,pseudo =  ? 
+        where id=$user_id ");
+        $req->execute([
+            $_POST["email"],
+            $targetFile,
+            $_POST["pseudo"]
+
+        ]);
+        $req = $dbh->prepare("
+        SELECT U.email, U.pseudo, U.id as user_id, U.image , PS.pass_prefix
+        FROM user U
+        INNER JOIN pass_sal PS ON PS.user_id = U.id 
+        WHERE U.pseudo= ?
+        LIMIT 1
+    ");
+
+        $req->execute([
+            $_POST["pseudo"]
+        ]);
+
+        $profil = $req->fetch();;
+        echo '<div class="alert alert-success">
+                <b>Félicitation!</b> Vos modifications ont bien ete prise en compte !!
+                </div> ';
+        session_destroy();
+    }
+    session_destroy();
+
+
     ?>
-    <div  id="formulaire" class=" container  mx-auto mt-2 mb-2">
-        <div class="card mx-auto mt-2 mb-2" style="width: 18rem;">
-            <img class="card-img-top" src="<?= $_SESSION["userData"]["image"] ?>" alt="Card image cap">
-            <div class="card-body">
-                <h5 class="card-title"><?= $_SESSION["userData"]["pseudo"] ?></h5>
-                <p class="card-text"><?= $_SESSION["userData"]["email"] ?></p>
-                <button type="submit" class="btn btn-info" onclick="display();">Modifier</button>
+
+    <div class="card mx-auto  " style="width:50vw;">
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item">
+                        <a class=" nav-link active text-primary" href=" http://app.fr/views/home.php">home <span class="sr-only">(current)</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class=" nav-link " href=" http://app.fr/views/login.php">Login <span class="sr-only">(current)</span></a>
+                    </li>
+                    <li class="nav-item ">
+                        <a class="nav-link " href="http://app.fr/views/registration.php">Registration</a>
+                    </li>
+                </ul>
+
             </div>
-        </div>
-    </div>
+        </nav>
 
+        <form id="inscription" method="post" enctype="multipart/form-data">
 
-    <div  id="formulaire2" class=" container  mx-auto mt-2 mb-2">
-    <form id="inscription" method="post" enctype="multipart/form-data">
-        <div class="card mx-auto mt-2 mb-2" style="width: 18rem;">
-            <label class="text-center font-weight-bold" for="image">Modifier votre avatar</label>
-            <img class="card-img-top" src="<?= $_SESSION["userData"]["image"] ?>" alt="Card image cap">
-            <div class="card-body">
-            <div class="form-group col ">
-                                <label class="font-weight-bold" for="pseudo">Modifier votre pseudo</label>
-                                <input type="text" class="form-control " name="pseudo" id="pseudo" aria-describedby="pseudoHelp" value="<?= $_SESSION["userData"]["pseudo"] ?>" required minlength="8" maxlength="20" pattern="^\W*(?=\S{8,20})(?=\S*[a-z])(?=\S*[\d])\S*$">
-                                <small id="pseudoLog" class="form-text text-muted">
-                                </small>
-            
-                        <label class="font-weight-bold" for="email">Modifier votre email</label>
-                        <input type="email" class="form-control " name="email" id="exampleInputEmail1" aria-describedby="emailHelp" value="<?= $_SESSION["userData"]["email"] ?>" required minlength="5" maxlength="40" pattern="[A-Za-z0-9](([_\.\-]?[a-zA-Z0-9]+)*)@([A-Za-z0-9]+)(([_\.\-]?[a-zA-Z0-9]+)*)\.([A-Za-z]{2,})">
-                        
-                        <small class="form-text text-muted"></small>
+            <div id="formulaire" class=" container  mx-auto mt-2 mb-2">
+                <div class="card mx-auto mt-2 mb-2" style="width: 18rem;">
+
+                    <img class="card-img-top" src="<?= $profil["image"] ?>" alt="Card image cap">
+                    <div class="card-body">
+                        <h5 class="card-title"><?= $profil["pseudo"] ?></h5>
+                        <p class="card-text"><?= $profil["email"] ?></p>
+                        <button type="submit" class="btn btn-info" onclick="display();">Modifier</button>
                     </div>
-
-                
-                
-                <button type="submit" class="btn btn-info" onclick="display2()"; >Modifier</button>
+                </div>
             </div>
-        </div>
-    </form>
+
+            <div id="formulaire2" class=" container  mx-auto mt-2 mb-2">
+                <div class="card mx-auto mt-2 mb-2" style="width: 18rem;">
+                    <label class="text-center font-weight-bold" for="image">Modifier votre avatar</label>
+                    <div class=" d-flex justify-content-center    " id="profile-container ">
+                        <img class="card-img-top" id="profileImage" src="<?= $profil["image"] ?>" alt="Card image cap">
+                    </div>
+                    <input id="imageUpload" for="image" name="image" type="file" placeholder="Photo" required="" capture>
+                    <div class="card-body">
+                        <div class="form-group col ">
+                            <label class="font-weight-bold" for="pseudo">Modifier votre pseudo</label>
+                            <input type="text" class="form-control " name="pseudo" id="pseudo" aria-describedby="pseudoHelp" value="<?= $profil["pseudo"] ?>" required minlength="8" maxlength="20" pattern="^\W*(?=\S{8,20})(?=\S*[a-z])(?=\S*[\d])\S*$">
+                            <small id="pseudoLog" class="form-text text-muted">
+                            </small>
+
+                            <label class="font-weight-bold" for="email">Modifier votre email</label>
+                            <input type="email" class="form-control " name="email" id="exampleInputEmail1" aria-describedby="emailHelp" value="<?= $profil["email"] ?>" required minlength="5" maxlength="40" pattern="[A-Za-z0-9](([_\.\-]?[a-zA-Z0-9]+)*)@([A-Za-z0-9]+)(([_\.\-]?[a-zA-Z0-9]+)*)\.([A-Za-z]{2,})">
+
+                            <small class="form-text text-muted"></small>
+                        </div>
+
+
+
+
+                        <button type="submit" class="btn btn-info" onclick="display2()" ;>Modifier</button>
+                    </div>
+                </div>
+        </form>
     </div>
-
-    
-
-
-
-
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
     <script type="text/javascript" src="login.js"></script>

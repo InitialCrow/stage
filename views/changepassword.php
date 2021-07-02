@@ -1,9 +1,5 @@
-<?php session_start();
+<?php session_start();?>
 
-
-
-
-?>
 <!DOCTYPE html>
 <html lang="fr">
 
@@ -22,13 +18,8 @@
     require_once "./database.php";
     $dbh = Database::connect();
 
-
-    var_dump($_SESSION);
-
-
     $date = date("Y-m-d H:i:s", strtotime('now'));
-    var_dump($date);
-
+  
     $url = $_SESSION['userData']['url_token'];
     $user_id = $_SESSION['userData']['user_id'];
     $urlexist = $dbh->prepare('SELECT * FROM Reset_password where url_token= ?');
@@ -36,15 +27,11 @@
         $url,
     ]);
     $urlexist = $urlexist->rowCount();
-    var_dump($_SESSION["userData"]["date_expiry"]);
-
-
-
-    if ($date < $_SESSION["userData"]["date_expiry"]) {
-
-
-        echo "1";
-    ?>
+  
+    if ($date < $_SESSION["userData"]["date_expiry"] ) {
+    
+        
+        ?>
         <div class="card mx-auto  " style="width:50vw;">
             <nav class="navbar navbar-expand-lg navbar-light bg-light">
 
@@ -65,8 +52,12 @@
 
                 </div>
             </nav>
+        <?php
+        if(empty($_POST)){
 
-            <form action="" class="form-group" method="post">
+            ?>
+
+            <form action="" id="form" class="form-group" method="post">
                 <div class="form-group">
                     <label for="Password">Password</label>
                     <input type="password" class="form-control" id="Password" name="password" placeholder="Entrer votre mot nouveau mot de passe ..." required minlength="8" maxlength="20" pattern="^\W*(?=\S{8,20})(?=\S*[a-z])(?=\S*[\d])\S*$">
@@ -89,19 +80,20 @@
 
     <?php
 
+}
 
-        if (!empty($_POST)) {
-
-            $password = hash("sha256", $_POST["password"]);
-            $salt = hash("sha256", random_bytes(15));
-            $password = hash("sha256", $salt . $password);
-
-            $req = $dbh->prepare("
-                            SELECT U.email, U.pseudo, U.id as user_id, U.image 
-                            FROM user U                    
-                            WHERE U.email= ?
-                            LIMIT 1
-                            ");
+if (!empty($_POST)) {
+    
+    $password = hash("sha256", $_POST["password"]);
+    $salt = hash("sha256", random_bytes(15));
+    $password = hash("sha256", $salt . $password);
+    
+    $req = $dbh->prepare("
+    SELECT U.email, U.pseudo, U.id as user_id, U.image 
+    FROM user U                    
+    WHERE U.email= ?
+    LIMIT 1
+    ");
 
             $req->execute([
                 $_SESSION["userData"]["email"]
@@ -119,9 +111,12 @@
                 $salt,
             ]);
 
+            
+
             echo '<div class="alert alert-success">
                             <b>Felicitation ! </b> votre mot de passe a bien ete changer !!!
                             </div> ';
+                            session_destroy();
         }
     } else {
 

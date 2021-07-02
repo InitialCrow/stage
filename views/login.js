@@ -35,33 +35,34 @@ function verif() {
     }
 
 }
+var formulaire2 = document.getElementById('formulaire2');
 formulaire2.style.display = 'none';
-function display(){
-    // on récupère l'élément form.
-    
+
+function display() {
+
     var formulaire2 = document.getElementById('formulaire2');
     var formulaire = document.getElementById('formulaire');
-  
-    
-   
-        formulaire2.style.display = 'block';
-        formulaire.style.display = 'none';
-    }
-function display2(){
-    .
-    
+
+    formulaire2.style.display = 'block';
+    formulaire.style.display = 'none';
+
+}
+
+function display2() {
+
     var formulaire2 = document.getElementById('formulaire2');
     var formulaire = document.getElementById('formulaire');
-  
+
+    formulaire2.style.display = 'none';
+    formulaire.style.display = 'none';
+
+}
+function form() {
+
     
+    var form = document.getElementById('form');
+
     
-        formulaire2.style.display = 'none';
-        formulaire.style.display = 'none';
-    }
+    form.style.display = 'none';
 
-
-
-
-
-
-
+}

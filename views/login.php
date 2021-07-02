@@ -53,8 +53,6 @@
         /*************************************LOGIN******************************************************** */
         if (isset($_POST)) { // Si le formulaire HTML a été soumis, 
 
-
-
             if (!empty($_POST["pseudo"]) && !empty($_POST["password"])) {
                 $req = $dbh->prepare("
                     SELECT U.email, U.pseudo, U.id as user_id, U.image , PS.pass_prefix
@@ -66,7 +64,7 @@
 
                 $req->execute([
                     $_POST["pseudo"]
-                    ]);
+                ]);
 
                 $salt = $req->fetch();
 
@@ -88,7 +86,7 @@
                 $req->execute([
                     $password,
                     $salt['user_id']
-                    ]);
+                ]);
 
                 $user = $req->fetch();
 
@@ -125,7 +123,6 @@
                         </small>
                     </div>
 
-
                     <div class="form-group">
                         <label for="password">Password</label>
                         <input type="password" class="form-control" name="password" id="Password1" placeholder="Votre mot de passe..." required minlength="8" maxlength="20" pattern="^\W*(?=\S{8,20})(?=\S*[a-z])(?=\S*[\d])\S*$">
@@ -134,13 +131,13 @@
                     </div>
                     <div class="etc-login-form">
                         <p>mot de passe oublie ? <a href="http://app.fr/views/reset.php"><i class="fas fa-lock fa-lg"></i></a></p>
-
                     </div>
+                    
                     <button type="submit" class="btn btn-primary">Submit</button>
                 </form>
             </div>
         </div>
-  </div>
+    </div>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
     <script type="text/javascript" src="login.js"></script>

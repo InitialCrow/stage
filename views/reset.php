@@ -31,8 +31,6 @@ require '../vendor/autoload.php';
         </div>
     <?php endif;
 
-
-
     if (isset($_POST['recup_submit'], $_POST['recup_mail'])) {
         if (!empty($_POST['recup_mail'])) {
             $recup_mail = htmlspecialchars($_POST['recup_mail']);
@@ -42,7 +40,6 @@ require '../vendor/autoload.php';
                     $recup_mail
                 ]);
 
-
                 $mailexist = $mailexist->rowCount();
                 if ($mailexist == 1) {
                     $_SESSION['recup_mail'] = $recup_mail;
@@ -51,8 +48,6 @@ require '../vendor/autoload.php';
                     $date = date("Y-m-d H:i:s", strtotime('now'));
                     $expiry = date('Y-m-d H:i:s', strtotime('now +1 Hour +30 Minutes'));
                     /*********************/
-
-
 
                     $req = $dbh->prepare("
                     SELECT U.email, U.pseudo, U.id as user_id, U.image , PS.pass_prefix
@@ -67,16 +62,8 @@ require '../vendor/autoload.php';
 
                     $user_id = $req->fetch();
 
-
-
-
-
-
-
-
                     $req = $dbh->prepare("
-                
-                
+                          
                     SELECT U.email, U.pseudo, U.id as user_id, U.image , RP.url_token, RP.date_expiry
                     FROM user U
                     INNER JOIN reset_password RP ON RP.user_id = U.id 
@@ -99,8 +86,6 @@ require '../vendor/autoload.php';
                     ]);
                     $lien = $req->fetch();
 
-
-
                     /******************************************ENVOI DU MAIL********************************************************************************************** */
 
 
@@ -120,25 +105,24 @@ require '../vendor/autoload.php';
                         $mail->SMTPAuth = false;
                         $mail->SMTPAutoTLS = false;
 
-                        $mail->Port = 1025;                                    //TCP port to connect to; use 587 if you have set `SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS`
+                        $mail->Port = 1025;
 
                         //Recipients
                         $mail->setFrom('from@example.com', 'Mailer');
-                        $mail->addAddress('joe@example.net', 'Joe User');     //Add a recipient
+                        $mail->addAddress('joe@example.net', 'Joe User');
 
 
-                        // //Attachments
-                        // $mail->addAttachment('/var/tmp/file.tar.gz');         //Add attachments
-                        // $mail->addAttachment('/tmp/image.jpg', 'new.jpg');    //Optional name
 
                         //Content
-                        $mail->isHTML(true);                                  //Set email format to HTML
+                        $mail->isHTML(true);
                         $mail->Subject = 'Here is the subject';
                         $mail->Body = "<a href='http://app.fr/views/changepassword.php?token=" . $token . "'>Cliquez ici</a>";
                         $mail->AltBody = 'This is the body in plain text for non-HTML mail clients';
 
                         $mail->send();
-                        echo 'Message has been sent';
+                        echo '<div class="alert alert-success">
+                <b>Félicitation!</b> Un message de reinitialisation vous a été envoyer sur votre boite mail !!!!
+                </div> ';
                     } catch (Exception $e) {
                         echo "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
                     }
@@ -155,9 +139,6 @@ require '../vendor/autoload.php';
                     ];
                     Database::disconnect();
                     $_SESSION['userData'] = $userData;
-
-
-
 
                     exit;
                 } else {
