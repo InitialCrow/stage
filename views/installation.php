@@ -3,8 +3,8 @@ function deploy()
 {
 
   $servername = 'localhost';
-  $username = 'root';
-  $password = '';
+  $username = 'phpmyadmin';
+  $password = 'root';
 
   try {
     $dbco = new PDO("mysql:host=$servername", $username, $password);
@@ -20,42 +20,42 @@ function deploy()
 
   $servname = 'localhost';
   $dbname = 'app';
-  $user = 'root';
-  $pass = '';
+  $user = 'phpmyadmin';
+  $pass = 'root';
 
   try {
     $dbco = new PDO("mysql:host=$servname;dbname=$dbname", $user, $pass);
     $dbco->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-    $sql = "CREATE TABLE User(
+    $sql = "CREATE TABLE user(
                 id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
                 email VARCHAR(80) NOT NULL,
                 image VARCHAR(80) NOT NULL,
                 pseudo VARCHAR(80) NOT NULL);
 
-                CREATE TABLE Pass_sal(
+                CREATE TABLE pass_sal(
                 id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
                 pass_prefix VARCHAR(80) NOT NULL,
                 user_id  BIGINT NOT NULL,
                 CONSTRAINT fk_user_pass_sal
                 FOREIGN KEY (user_id)
-                REFERENCES User(id)) ;
+                REFERENCES user(id)) ;
 
-                CREATE TABLE Password(
+                CREATE TABLE password(
                 id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
                 password VARCHAR(80) NOT NULL,
                 user_id  BIGINT NOT NULL,
                 CONSTRAINT fk_user_password
                 FOREIGN KEY (user_id)
-                REFERENCES User(id));
+                REFERENCES user(id));
 
-                CREATE TABLE Reset_password(
+                CREATE TABLE reset_password(
                 id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
                 url_token VARCHAR(80) NOT NULL,
                 user_id  BIGINT NOT NULL,
                 CONSTRAINT fk_user_reset_password
                 FOREIGN KEY (user_id)
-                REFERENCES User(id)) ";
+                REFERENCES user(id)) ";
 
     $dbco->exec($sql);
     echo 'Table bien créée !';

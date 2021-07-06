@@ -4,6 +4,7 @@ if (!isset($_SESSION) || empty($_SESSION) || !isset($_SESSION['userData'])) {
     header('Location: /views/login.php?status=expired');
     exit;
 }
+
 ?>
 
 <!DOCTYPE html>

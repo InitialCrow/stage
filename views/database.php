@@ -3,8 +3,8 @@
 class Database { // Fichier de configuration de la connexion à la BDD MySQL 
     private static $dbName = 'app'; // Nom de la BDD 
     private static $dbHost = 'localhost'; // Hôte de la BDD 
-    private static $dbUsername = 'root'; // Nom d'utilisateur de la BDD 
-    private static $dbUserPassword = ''; // Mot de passe de la BDD 
+    private static $dbUsername = 'phpmyadmin'; // Nom d'utilisateur de la BDD 
+    private static $dbUserPassword = 'root'; // Mot de passe de la BDD 
     private static $dbh = null;
     
     public static function connect() {

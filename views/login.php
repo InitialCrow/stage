@@ -1,4 +1,5 @@
 <?php session_start(); ?>
+
 <!DOCTYPE html>
 <html lang="fr">
 
@@ -32,10 +33,10 @@
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav mr-auto">
                     <li class="nav-item active ">
-                        <a class="nav-link text-primary" href="http://app.fr/views/login.php">Login <span class="sr-only">(current)</span></a>
+                        <a class="nav-link text-primary" href="/views/login.php">Login <span class="sr-only">(current)</span></a>
                     </li>
                     <li class="nav-item ">
-                        <a class="nav-link " href="http://app.fr/views/registration.php">Registration</a>
+                        <a class="nav-link " href="/views/registration.php">Registration</a>
                     </li>
 
 

@@ -42,6 +42,7 @@
         if (isset($_POST['password']));
         if (isset($_FILES['name']));
         if (!empty($_POST)) {
+            
             $fileName = $_FILES['image']['name'];
             $targetFile = "./upload/$fileName";
 
@@ -76,6 +77,7 @@
             echo '<div class="alert alert-success">
                 <b>Félicitation!</b> Votre compte a bien été enregistré, vous pouvez des maintenant vous connectez !!!!
                 </div> ';
+       
             Database::disconnect();
         } 
 
