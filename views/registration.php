@@ -13,6 +13,11 @@
 
 <body>
     <div class="card mx-auto  " style="width:50vw;">
+        <?php if(isset($_GET['status']) && $_GET['status'] =="created" ): ?>
+            <div class="alert alert-success">
+                <b>Félicitation!</b> Votre compte a bien été enregistré, vous pouvez des maintenant vous connectez !!!!
+            </div>
+        <?php endif; ?>
         <nav class="navbar navbar-expand-lg navbar-light bg-light">
 
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -31,60 +36,10 @@
 
             </div>
         </nav>
-        <?php
 
-        require_once "./database.php";
-        $dbh = Database::connect();
-
-        if (isset($_POST['email']));
-        if (isset($_POST['image']));
-        if (isset($_POST['pseudo']));
-        if (isset($_POST['password']));
-        if (isset($_FILES['name']));
-        if (!empty($_POST)) {
-            
-            $fileName = $_FILES['image']['name'];
-            $targetFile = "./upload/$fileName";
-
-            move_uploaded_file($_FILES['image']['tmp_name'], $targetFile);
-
-            $password = hash("sha256", $_POST["password"]);
-            $salt = hash("sha256", bin2hex(random_bytes(15)));
-            $password = hash("sha256", $salt . $password);
-
-            $stmt = $dbh->prepare("INSERT INTO `user` (email, image, pseudo) VALUES (?,?,?)");
-            $stmt->execute([
-                $_POST["email"],
-                $targetFile,
-                $_POST["pseudo"]
-            ]);
-
-            $user_id = $dbh->lastInsertId();
-
-            $stmt = $dbh->prepare("INSERT INTO `password` (user_id,password) VALUES (?,?)");
-            $stmt->execute([
-                $user_id,
-                $password,
-
-            ]);
-            $stmt = $dbh->prepare("INSERT INTO `pass_sal` (pass_prefix,user_id) VALUES (?,?)");
-            $stmt->execute([
-                $salt,
-                $user_id,
-
-            ]);
-
-            echo '<div class="alert alert-success">
-                <b>Félicitation!</b> Votre compte a bien été enregistré, vous pouvez des maintenant vous connectez !!!!
-                </div> ';
-       
-            Database::disconnect();
-        } 
-
-        ?>
 
         <div class="tab-content mx-5 mt-2 mb-2" id="myTabContent">
-            <form id="inscription" method="post" enctype="multipart/form-data">
+            <form id="inscription" method="post" action="/actions/register.php" enctype="multipart/form-data">
                 <div class="box box-primary">
                     <div class="box-body box-profile">
 
