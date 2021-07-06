@@ -1,10 +1,14 @@
 <?php
+require_once __DIR__."/../vendor/autoload.php";
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__.'/..');
+$dotenv->load();
+
 function deploy()
 {
-
-  $servername = 'localhost';
-  $username = 'phpmyadmin';
-  $password = 'root';
+  
+  $servername = $_ENV['DB_HOST'];
+  $username = $_ENV['DB_USER'];
+  $password = $_ENV['DB_PASS'];
 
   try {
     $dbco = new PDO("mysql:host=$servername", $username, $password);
@@ -18,10 +22,11 @@ function deploy()
     echo "Erreur : " . $e->getMessage();
   }
 
-  $servname = 'localhost';
-  $dbname = 'app';
-  $user = 'phpmyadmin';
-  $pass = 'root';
+
+  $dbname = $_ENV['DB_NAME'];
+  $servname = $_ENV['DB_HOST'];
+  $user= $_ENV['DB_USER'];
+  $pass = $_ENV['DB_PASS'];
 
   try {
     $dbco = new PDO("mysql:host=$servname;dbname=$dbname", $user, $pass);

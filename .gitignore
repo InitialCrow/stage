@@ -1,3 +1,4 @@
 /views/upload/
 /vendor/
 composer.lock
+.env

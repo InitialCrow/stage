@@ -1,18 +1,17 @@
 <?php
-
+require_once __DIR__."/../vendor/autoload.php";
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__.'/..');
+$dotenv->load();
 class Database { // Fichier de configuration de la connexion à la BDD MySQL 
-    private static $dbName = 'app'; // Nom de la BDD 
-    private static $dbHost = 'localhost'; // Hôte de la BDD 
-    private static $dbUsername = 'phpmyadmin'; // Nom d'utilisateur de la BDD 
-    private static $dbUserPassword = 'root'; // Mot de passe de la BDD 
+
     private static $dbh = null;
     
     public static function connect() {
         if (null == self::$dbh) {
             try { // On créé une nouvelle instance de PDO pour permettre la connexion 
                 self::$dbh = new PDO(
-                    "mysql:host=".self::$dbHost.";"."dbname=".self::$dbName,
-                    self::$dbUsername, self::$dbUserPassword
+                    "mysql:host=".$_ENV['DB_HOST'].";"."dbname=".$_ENV['DB_NAME'],
+                    $_ENV['DB_USER'], $_ENV['DB_PASS']
                 );
             } catch(PDOException $e) { // En cas d'erreur, le script PHP est stoppé avec un message d'erreur
                 die($e->getMessage());
